@@ -83,7 +83,31 @@ footer{font-size:12px;color:#91a6c1;line-height:1.6;padding:8px}
 <p class="small">These are planning values only. They do not control an account or calculate lot size.</p>
 </section>
 
-<section class="card">
+
+<section class="card" id="backtest">
+<h2>Historical Backtest</h2>
+<p>Test the EMA 20/50 + RSI 14 strategy on the loaded historical candles.</p>
+
+<label for="spread">Estimated spread (pips)</label>
+<input id="spread" type="number" min="0" max="10" step="0.1" value="1.2">
+
+<label for="slippage">Estimated slippage per side (pips)</label>
+<input id="slippage" type="number" min="0" max="5" step="0.1" value="0.2">
+
+<button class="primary" id="runBacktest">Run Historical Backtest</button>
+<p class="small">Costs are estimates, not your broker's actual historical costs. Commission and swaps are not yet included. A backtest does not predict future results.</p>
+
+<div class="grid">
+<div class="metric"><div class="small">Trades</div><div class="value" id="btTrades">—</div></div>
+<div class="metric"><div class="small">Win rate</div><div class="value" id="btWin">—</div></div>
+<div class="metric"><div class="small">Net result (pips)</div><div class="value" id="btNet">—</div></div>
+<div class="metric"><div class="small">Profit factor</div><div class="value" id="btPF">—</div></div>
+<div class="metric"><div class="small">Maximum drawdown (pips)</div><div class="value" id="btDD">—</div></div>
+<div class="metric"><div class="small">Data sample</div><div class="value" id="btSample">—</div></div>
+</div>
+<p id="btStatus" role="status">Fetch market candles first, then run the backtest.</p>
+</section>
+  <section class="card">
 <h2>Development Progress</h2>
 <p>Website dashboard: <span class="good">Ready</span></p>
 <p>Market candle feed: <span id="feedstate" class="neutral">Not tested</span></p>
