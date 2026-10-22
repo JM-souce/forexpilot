@@ -1,0 +1,157 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForexPilot AI</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b1220;color:#edf3fc;font:15px Arial,sans-serif}
+header{padding:20px;background:#111c2e;border-bottom:1px solid #293950}
+h1{margin:0;font-size:25px}
+h1 span{color:#32dda3}
+header p,.muted{color:#9bacc2;font-size:12px}
+main{max-width:750px;margin:auto;padding:15px}
+.card{background:#121e30;border:1px solid #293950;border-radius:14px;padding:16px;margin-bottom:14px}
+h2{font-size:17px;margin:0 0 14px}
+label{display:block;color:#9bacc2;font-size:12px;margin:12px 0 6px}
+select,input{width:100%;padding:12px;background:#0b1422;color:white;border:1px solid #34455d;border-radius:8px}
+button{cursor:pointer;border:0;border-radius:9px;padding:12px;font-weight:bold}
+.primary{width:100%;background:#32dda3;color:#06281e;margin-top:14px}
+.tabs{display:flex;gap:8px;margin-bottom:14px}
+.tab{flex:1;background:#18263a;color:#b6c5d8}
+.tab.active{background:#174333;color:#55efb6;border:1px solid #32dda3}
+.notice{background:#352c19;border:1px solid #67542a;color:#f5dba0;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:14px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{background:#1a2940;border-radius:9px;padding:12px;overflow-wrap:anywhere}
+.metric strong{display:block;font-size:18px;margin-top:6px}
+.result{font-size:25px;font-weight:bold;margin:8px 0}
+.green{color:#32dda3}.red{color:#ff7588}
+.small{font-size:12px;line-height:1.6;color:#9bacc2}
+.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #293950}
+.row:last-child{border-bottom:0}
+.badge{font-size:11px;padding:6px 9px;border-radius:20px;background:#26364b;color:#b7c9df}
+.hidden{display:none}
+footer{text-align:center;padding:10px 20px 25px;color:#8b9bb1;font-size:11px}
+</style>
+</head>
+<body>
+<header>
+<h1>Forex<span>Pilot</span> AI</h1>
+<p>Your forex analysis dashboard · Version 1.0</p>
+</header>
+<main>
+<div class="notice">
+DEMO PROTOTYPE: Prices and signals are illustrative, not live market data. This app is not connected to MT5 and cannot place trades.
+</div>
+
+<div class="tabs">
+<button class="tab active" id="signalTab" onclick="mode('signals')">Signal Mode</button>
+<button class="tab" id="autoTab" onclick="mode('auto')">Auto Mode</button>
+</div>
+
+<section id="signals">
+<div class="card">
+<h2>Market Analysis</h2>
+<label for="pair">Currency pair</label>
+<select id="pair">
+<option>EURUSD</option>
+<option>GBPUSD</option>
+<option>USDJPY</option>
+<option>AUDUSD</option>
+<option>USDCAD</option>
+</select>
+<label for="timeframe">Timeframe</label>
+<select id="timeframe">
+<option>M15</option><option>H1</option><option>H4</option>
+</select>
+<label for="strategy">Strategy</label>
+<select id="strategy">
+<option value="trend">EMA trend + RSI confirmation</option>
+<option value="conservative">Conservative trend filter</option>
+</select>
+<button class="primary" onclick="analyze()">Generate Example Signal</button>
+</div>
+
+<div class="card">
+<div class="muted">ANALYSIS RESULT</div>
+<div id="signal" class="result">NO TRADE</div>
+<p id="explanation" class="small">Select your settings and generate an example. No live prices are used.</p>
+<div class="grid">
+<div class="metric"><span class="muted">Example entry</span><strong id="entry">—</strong></div>
+<div class="metric"><span class="muted">Stop-loss</span><strong id="stop">—</strong></div>
+<div class="metric"><span class="muted">Take-profit</span><strong id="target">—</strong></div>
+<div class="metric"><span class="muted">Risk / reward</span><strong>1 : 2</strong></div>
+</div>
+</div>
+
+<div class="card">
+<h2>Risk Management</h2>
+<label for="risk">Risk per trade (%)</label>
+<input id="risk" type="number" min="0.1" max="1" step="0.1" value="0.5">
+<label for="daily">Daily loss limit (%)</label>
+<input id="daily" type="number" min="0.5" max="2" step="0.5" value="2">
+<p class="small">These are planning settings only. They do not control a broker account.</p>
+</div>
+</section>
+
+<section id="automatic" class="hidden">
+<div class="card">
+<h2>Automatic Trading</h2>
+<div class="notice">AUTOMATION LOCKED — no broker connection is configured.</div>
+<div class="row"><span>MT5 connection</span><span class="badge">Disconnected</span></div>
+<div class="row"><span>Account type</span><span class="badge">Not connected</span></div>
+<div class="row"><span>Automatic orders</span><span class="badge">Disabled</span></div>
+<div class="row"><span>Risk protection</span><span class="badge">Not connected</span></div>
+<p class="small">We will implement this section after the signal strategy is tested and a secure MT5 demo connection is available.</p>
+</div>
+</section>
+
+<div class="card">
+<h2>Development Progress</h2>
+<div class="row"><span>Dashboard</span><span class="green">Ready</span></div>
+<div class="row"><span>Signal interface</span><span class="green">Ready</span></div>
+<div class="row"><span>Real market data</span><span class="badge">Not connected</span></div>
+<div class="row"><span>MT5 automation</span><span class="badge">Not built</span></div>
+</div>
+</main>
+<footer>ForexPilot AI · Educational prototype. Forex trading involves risk. Simulated signals do not predict future profits.</footer>
+
+<script>
+function mode(selected){
+ const isSignals=selected==='signals';
+ document.getElementById('signals').classList.toggle('hidden',!isSignals);
+ document.getElementById('automatic').classList.toggle('hidden',isSignals);
+ document.getElementById('signalTab').classList.toggle('active',isSignals);
+ document.getElementById('autoTab').classList.toggle('active',!isSignals);
+}
+function analyze(){
+ const pair=document.getElementById('pair').value;
+ const tf=document.getElementById('timeframe').value;
+ const strategy=document.getElementById('strategy').value;
+ const prices={
+ EURUSD:{p:1.0842,d:.0010},
+ GBPUSD:{p:1.2715,d:.0012},
+ USDJPY:{p:149.25,d:.12},
+ AUDUSD:{p:.6542,d:.0010},
+ USDCAD:{p:1.3612,d:.0011}
+ };
+ const item=prices[pair];
+ const key=(pair.length+tf.length+strategy.length)%3;
+ const signal=key===0?'BUY':key===1?'SELL':'NO TRADE';
+ const digits=pair==='USDJPY'?3:5;
+ const fmt=n=>n.toFixed(digits);
+ const result=document.getElementById('signal');
+ result.textContent=signal;
+ result.className='result '+(signal==='BUY'?'green':signal==='SELL'?'red':'');
+ document.getElementById('entry').textContent=fmt(item.p);
+ document.getElementById('stop').textContent=signal==='NO TRADE'?'—':fmt(item.p+(signal==='BUY'?-item.d:item.d));
+ document.getElementById('target').textContent=signal==='NO TRADE'?'—':fmt(item.p+(signal==='BUY'?2*item.d:-2*item.d));
+ document.getElementById('explanation').textContent=
+ 'Illustrative '+signal+' output for '+pair+' on '+tf+'. These example prices are fixed and no EMA, RSI, or real market data has been calculated. This is not a trading recommendation.';
+}
+</script>
+</body>
+  </html>
+  
