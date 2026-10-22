@@ -273,14 +273,18 @@ function runHistoricalBacktest() {
       }
 
       const bars = data.bars.map(b => ({
-        time: b.openTime,
-        open: Number(b.open),
-        high: Number(b.high),
-        low: Number(b.low),
-        close: Number(b.close)
-      }))
-      .filter(b => [b.open, b.high, b.low, b.close].every(Number.isFinite))
-      .sort((a, b) => new Date(a.time) - new Date(b.time));
+  time: b.openTime,
+  open: Number(b.open),
+  high: Number(b.high),
+  low: Number(b.low),
+  close: Number(b.close),
+  isOpen: b.isOpen === true
+}))
+.filter(b =>
+  !b.isOpen &&
+  [b.open, b.high, b.low, b.close].every(Number.isFinite)
+)
+.sort((a, b) => new Date(a.time) - new Date(b.time));
 
       if (bars.length < 80) throw new Error("Not enough valid candles.");
 
