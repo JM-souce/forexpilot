@@ -6,152 +6,228 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>ForexPilot AI</title>
 <style>
+:root{color-scheme:dark}
 *{box-sizing:border-box}
-body{margin:0;background:#0b1220;color:#edf3fc;font:15px Arial,sans-serif}
-header{padding:20px;background:#111c2e;border-bottom:1px solid #293950}
-h1{margin:0;font-size:25px}
-h1 span{color:#32dda3}
-header p,.muted{color:#9bacc2;font-size:12px}
-main{max-width:750px;margin:auto;padding:15px}
-.card{background:#121e30;border:1px solid #293950;border-radius:14px;padding:16px;margin-bottom:14px}
-h2{font-size:17px;margin:0 0 14px}
-label{display:block;color:#9bacc2;font-size:12px;margin:12px 0 6px}
-select,input{width:100%;padding:12px;background:#0b1422;color:white;border:1px solid #34455d;border-radius:8px}
-button{cursor:pointer;border:0;border-radius:9px;padding:12px;font-weight:bold}
-.primary{width:100%;background:#32dda3;color:#06281e;margin-top:14px}
-.tabs{display:flex;gap:8px;margin-bottom:14px}
-.tab{flex:1;background:#18263a;color:#b6c5d8}
-.tab.active{background:#174333;color:#55efb6;border:1px solid #32dda3}
-.notice{background:#352c19;border:1px solid #67542a;color:#f5dba0;padding:12px;border-radius:10px;font-size:12px;line-height:1.5;margin-bottom:14px}
+body{margin:0;background:#08111f;color:#edf4ff;font:15px Arial,sans-serif}
+main{max-width:700px;margin:auto;padding:18px}
+header,.card{background:#111e30;border:1px solid #26374f;border-radius:16px;padding:17px;margin-bottom:14px}
+h1{margin:0 0 7px;color:#65e6a5;font-size:27px}
+h2{font-size:18px;margin:0 0 14px}
+p{line-height:1.5;color:#b7c6da}
+.warning{background:#332817;border-radius:10px;padding:12px;color:#ffda8b;font-size:13px;line-height:1.5}
+label{display:block;margin:13px 0 6px;color:#c5d3e7}
+select,input{width:100%;padding:12px;background:#091524;color:white;border:1px solid #344a66;border-radius:9px;font-size:15px}
+button{width:100%;padding:14px;border:0;border-radius:10px;font-size:16px;font-weight:bold;cursor:pointer}
+.primary{background:#40d995;color:#062016;margin-top:16px}
+.secondary{background:#253952;color:#fff;margin-top:8px}
+.result{font-size:27px;font-weight:bold;margin:8px 0}
 .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.metric{background:#1a2940;border-radius:9px;padding:12px;overflow-wrap:anywhere}
-.metric strong{display:block;font-size:18px;margin-top:6px}
-.result{font-size:25px;font-weight:bold;margin:8px 0}
-.green{color:#32dda3}.red{color:#ff7588}
-.small{font-size:12px;line-height:1.6;color:#9bacc2}
-.row{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #293950}
-.row:last-child{border-bottom:0}
-.badge{font-size:11px;padding:6px 9px;border-radius:20px;background:#26364b;color:#b7c9df}
-.hidden{display:none}
-footer{text-align:center;padding:10px 20px 25px;color:#8b9bb1;font-size:11px}
+.metric{background:#091524;border-radius:10px;padding:12px;overflow-wrap:anywhere}
+.small{font-size:12px;color:#91a6c1}
+.value{font-size:17px;font-weight:bold;margin-top:7px}
+.good{color:#58e5a0}.bad{color:#ff7878}.neutral{color:#ffd479}
+#status{font-size:13px;line-height:1.5;overflow-wrap:anywhere}
+footer{font-size:12px;color:#91a6c1;line-height:1.6;padding:8px}
 </style>
 </head>
 <body>
-<header>
-<h1>Forex<span>Pilot</span> AI</h1>
-<p>Your forex analysis dashboard · Version 1.0</p>
-</header>
 <main>
-<div class="notice">
-DEMO PROTOTYPE: Prices and signals are illustrative, not live market data. This app is not connected to MT5 and cannot place trades.
-</div>
+<header>
+<h1>ForexPilot AI</h1>
+<p>Your forex analysis dashboard · Version 2.0</p>
+<div class="warning">Analysis and education only. Signals are not financial advice. No broker or MT5 connection exists. Test results on a demo account before considering any real trading.</div>
+</header>
 
-<div class="tabs">
-<button class="tab active" id="signalTab" onclick="mode('signals')">Signal Mode</button>
-<button class="tab" id="autoTab" onclick="mode('auto')">Auto Mode</button>
-</div>
-
-<section id="signals">
-<div class="card">
+<section class="card">
 <h2>Market Analysis</h2>
 <label for="pair">Currency pair</label>
 <select id="pair">
-<option>EURUSD</option>
-<option>GBPUSD</option>
-<option>USDJPY</option>
-<option>AUDUSD</option>
+<option>EURUSD</option><option>GBPUSD</option>
+<option>USDJPY</option><option>AUDUSD</option>
 <option>USDCAD</option>
 </select>
-<label for="timeframe">Timeframe</label>
-<select id="timeframe">
-<option>M15</option><option>H1</option><option>H4</option>
+<label for="tf">Timeframe</label>
+<select id="tf">
+<option value="15m">M15 — 15 minutes</option>
+<option value="1h">H1 — 1 hour</option>
+<option value="4h">H4 — 4 hours</option>
 </select>
-<label for="strategy">Strategy</label>
-<select id="strategy">
-<option value="trend">EMA trend + RSI confirmation</option>
-<option value="conservative">Conservative trend filter</option>
-</select>
-<button class="primary" onclick="analyze()">Generate Example Signal</button>
-</div>
+<label>Strategy</label>
+<input value="EMA 20/50 + RSI 14 + ATR 14" readonly>
+<button class="primary" id="analyze">Fetch candles & calculate signal</button>
+<button class="secondary" id="refresh">Refresh market data</button>
+<p id="status" role="status">Ready. Tap the green button to fetch market candles.</p>
+</section>
 
-<div class="card">
-<div class="muted">ANALYSIS RESULT</div>
-<div id="signal" class="result">NO TRADE</div>
-<p id="explanation" class="small">Select your settings and generate an example. No live prices are used.</p>
+<section class="card">
+<h2>Analysis Result</h2>
+<div id="signal" class="result neutral">NO TRADE</div>
+<p id="reason">Waiting for market data.</p>
 <div class="grid">
-<div class="metric"><span class="muted">Example entry</span><strong id="entry">—</strong></div>
-<div class="metric"><span class="muted">Stop-loss</span><strong id="stop">—</strong></div>
-<div class="metric"><span class="muted">Take-profit</span><strong id="target">—</strong></div>
-<div class="metric"><span class="muted">Risk / reward</span><strong>1 : 2</strong></div>
+<div class="metric"><div class="small">Latest candle close</div><div class="value" id="entry">—</div></div>
+<div class="metric"><div class="small">EMA 20 / EMA 50</div><div class="value" id="emas">—</div></div>
+<div class="metric"><div class="small">RSI (14)</div><div class="value" id="rsi">—</div></div>
+<div class="metric"><div class="small">ATR (14)</div><div class="value" id="atr">—</div></div>
+<div class="metric"><div class="small">Example stop-loss</div><div class="value" id="sl">—</div></div>
+<div class="metric"><div class="small">Example take-profit</div><div class="value" id="tp">—</div></div>
 </div>
-</div>
+<p class="small" id="updated">No data fetched yet.</p>
+</section>
 
-<div class="card">
-<h2>Risk Management</h2>
+<section class="card">
+<h2>Risk Planning</h2>
 <label for="risk">Risk per trade (%)</label>
 <input id="risk" type="number" min="0.1" max="1" step="0.1" value="0.5">
 <label for="daily">Daily loss limit (%)</label>
 <input id="daily" type="number" min="0.5" max="2" step="0.5" value="2">
-<p class="small">These are planning settings only. They do not control a broker account.</p>
-</div>
+<p class="small">These are planning values only. They do not control an account or calculate lot size.</p>
 </section>
 
-<section id="automatic" class="hidden">
-<div class="card">
-<h2>Automatic Trading</h2>
-<div class="notice">AUTOMATION LOCKED — no broker connection is configured.</div>
-<div class="row"><span>MT5 connection</span><span class="badge">Disconnected</span></div>
-<div class="row"><span>Account type</span><span class="badge">Not connected</span></div>
-<div class="row"><span>Automatic orders</span><span class="badge">Disabled</span></div>
-<div class="row"><span>Risk protection</span><span class="badge">Not connected</span></div>
-<p class="small">We will implement this section after the signal strategy is tested and a secure MT5 demo connection is available.</p>
-</div>
-</section>
-
-<div class="card">
+<section class="card">
 <h2>Development Progress</h2>
-<div class="row"><span>Dashboard</span><span class="green">Ready</span></div>
-<div class="row"><span>Signal interface</span><span class="green">Ready</span></div>
-<div class="row"><span>Real market data</span><span class="badge">Not connected</span></div>
-<div class="row"><span>MT5 automation</span><span class="badge">Not built</span></div>
-</div>
+<p>Website dashboard: <span class="good">Ready</span></p>
+<p>Market candle feed: <span id="feedstate" class="neutral">Not tested</span></p>
+<p>EMA / RSI / ATR calculations: <span id="calcstate" class="neutral">Waiting</span></p>
+<p>MT5 automation: <span class="neutral">Not built</span></p>
+</section>
+<footer>
+Market data provider: biquote.io. Network access or provider availability may affect results. The latest candle may still be forming. Candle prices can differ from your broker. Never treat a signal as a guarantee.
+</footer>
 </main>
-<footer>ForexPilot AI · Educational prototype. Forex trading involves risk. Simulated signals do not predict future profits.</footer>
 
 <script>
-function mode(selected){
- const isSignals=selected==='signals';
- document.getElementById('signals').classList.toggle('hidden',!isSignals);
- document.getElementById('automatic').classList.toggle('hidden',isSignals);
- document.getElementById('signalTab').classList.toggle('active',isSignals);
- document.getElementById('autoTab').classList.toggle('active',!isSignals);
+const $ = id => document.getElementById(id);
+let busy = false;
+
+function ema(values, period) {
+  if (values.length < period) return NaN;
+  const k = 2 / (period + 1);
+  let v = values.slice(0, period).reduce((a,b)=>a+b,0)/period;
+  for (let i=period;i<values.length;i++) v=values[i]*k+v*(1-k);
+  return v;
 }
-function analyze(){
- const pair=document.getElementById('pair').value;
- const tf=document.getElementById('timeframe').value;
- const strategy=document.getElementById('strategy').value;
- const prices={
- EURUSD:{p:1.0842,d:.0010},
- GBPUSD:{p:1.2715,d:.0012},
- USDJPY:{p:149.25,d:.12},
- AUDUSD:{p:.6542,d:.0010},
- USDCAD:{p:1.3612,d:.0011}
- };
- const item=prices[pair];
- const key=(pair.length+tf.length+strategy.length)%3;
- const signal=key===0?'BUY':key===1?'SELL':'NO TRADE';
- const digits=pair==='USDJPY'?3:5;
- const fmt=n=>n.toFixed(digits);
- const result=document.getElementById('signal');
- result.textContent=signal;
- result.className='result '+(signal==='BUY'?'green':signal==='SELL'?'red':'');
- document.getElementById('entry').textContent=fmt(item.p);
- document.getElementById('stop').textContent=signal==='NO TRADE'?'—':fmt(item.p+(signal==='BUY'?-item.d:item.d));
- document.getElementById('target').textContent=signal==='NO TRADE'?'—':fmt(item.p+(signal==='BUY'?2*item.d:-2*item.d));
- document.getElementById('explanation').textContent=
- 'Illustrative '+signal+' output for '+pair+' on '+tf+'. These example prices are fixed and no EMA, RSI, or real market data has been calculated. This is not a trading recommendation.';
+function rsi(values, period=14) {
+  if (values.length <= period) return NaN;
+  let gain=0, loss=0;
+  for(let i=1;i<=period;i++){
+    const d=values[i]-values[i-1];
+    if(d>0) gain+=d; else loss-=d;
+  }
+  gain/=period; loss/=period;
+  for(let i=period+1;i<values.length;i++){
+    const d=values[i]-values[i-1];
+    gain=(gain*(period-1)+Math.max(d,0))/period;
+    loss=(loss*(period-1)+Math.max(-d,0))/period;
+  }
+  if(loss===0) return gain===0?50:100;
+  return 100-100/(1+gain/loss);
 }
+function atr(bars, period=14) {
+  if(bars.length < period+1) return NaN;
+  const trs=[];
+  for(let i=1;i<bars.length;i++){
+    trs.push(Math.max(
+      bars[i].high-bars[i].low,
+      Math.abs(bars[i].high-bars[i-1].close),
+      Math.abs(bars[i].low-bars[i-1].close)
+    ));
+  }
+  let v=trs.slice(0,period).reduce((a,b)=>a+b,0)/period;
+  for(let i=period;i<trs.length;i++) v=(v*(period-1)+trs[i])/period;
+  return v;
+}
+function fmt(n, pair) {
+  if(!Number.isFinite(n)) return "—";
+  return n.toFixed(pair.endsWith("JPY")?3:5);
+}
+function setStatus(msg){$("status").textContent=msg;}
+
+async function analyze(){
+  if(busy)return;
+  busy=true;
+  $("analyze").disabled=true;
+  $("refresh").disabled=true;
+  $("signal").textContent="LOADING";
+  $("signal").className="result neutral";
+  setStatus("Fetching candles from the market-data provider...");
+  $("feedstate").textContent="Connecting...";
+  $("feedstate").className="neutral";
+
+  const pair=$("pair").value;
+  const interval=$("tf").value;
+  const url=`https://biquote.io/api/${pair}/ohlc?interval=${interval}&limit=200`;
+
+  try {
+    const response=await fetch(url,{cache:"no-store"});
+    if(!response.ok) throw new Error("Provider returned HTTP "+response.status);
+    const data=await response.json();
+    if(!Array.isArray(data.bars)||data.bars.length<60)
+      throw new Error("Not enough candle data. Try again later.");
+
+    const bars=data.bars.map(b=>({
+      time:b.openTime,
+      open:Number(b.open),
+      high:Number(b.high),
+      low:Number(b.low),
+      close:Number(b.close)
+    })).filter(b=>[b.open,b.high,b.low,b.close].every(Number.isFinite))
+      .sort((a,b)=>new Date(a.time)-new Date(b.time));
+
+    if(bars.length<60) throw new Error("Too few valid candles to calculate indicators.");
+
+    const closes=bars.map(b=>b.close);
+    const fast=ema(closes,20), slow=ema(closes,50);
+    const momentum=rsi(closes,14), volatility=atr(bars,14);
+    const last=bars[bars.length-1], price=last.close;
+    if(![fast,slow,momentum,volatility,price].every(Number.isFinite))
+      throw new Error("Indicator calculation failed.");
+
+    let signal="NO TRADE", reason="The EMA trend and RSI do not meet the entry rules.";
+    if(fast>slow && momentum>=50 && momentum<=70){
+      signal="BUY";
+      reason="EMA 20 is above EMA 50 and RSI is within the bullish confirmation range.";
+    } else if(fast<slow && momentum>=30 && momentum<=50){
+      signal="SELL";
+      reason="EMA 20 is below EMA 50 and RSI is within the bearish confirmation range.";
+    }
+
+    const direction=signal==="BUY"?1:signal==="SELL"?-1:0;
+    const stop=direction?price-direction*1.5*volatility:NaN;
+    const target=direction?price+direction*3*volatility:NaN;
+
+    $("signal").textContent=signal;
+    $("signal").className="result "+(signal==="BUY"?"good":signal==="SELL"?"bad":"neutral");
+    $("reason").textContent=reason;
+    $("entry").textContent=fmt(price,pair);
+    $("emas").textContent=fmt(fast,pair)+" / "+fmt(slow,pair);
+    $("rsi").textContent=momentum.toFixed(2);
+    $("atr").textContent=fmt(volatility,pair);
+    $("sl").textContent=fmt(stop,pair);
+    $("tp").textContent=fmt(target,pair);
+    $("updated").textContent="Last returned candle: "+(last.time||"time unavailable")+" · "+bars.length+" candles used.";
+    $("feedstate").textContent="Connected";
+    $("feedstate").className="good";
+    $("calcstate").textContent="Calculated";
+    $("calcstate").className="good";
+    setStatus("Data received and indicators calculated. Verify prices against your broker; no trades were placed.");
+  } catch(err) {
+    $("signal").textContent="NO TRADE";
+    $("signal").className="result neutral";
+    $("reason").textContent="No reliable signal because market data could not be processed.";
+    $("feedstate").textContent="Failed";
+    $("feedstate").className="bad";
+    $("calcstate").textContent="Unavailable";
+    $("calcstate").className="bad";
+    setStatus("Error: "+err.message+". Check your connection and retry. No trade was placed.");
+  } finally {
+    busy=false;
+    $("analyze").disabled=false;
+    $("refresh").disabled=false;
+  }
+}
+$("analyze").addEventListener("click",analyze);
+$("refresh").addEventListener("click",analyze);
 </script>
 </body>
-  </html>
-  
+ </html>
+ 
