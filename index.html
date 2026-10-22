@@ -263,7 +263,7 @@ function runHistoricalBacktest() {
       const interval = $("tf").value;
       const spread = Math.max(0, Number($("spread").value) || 0);
       const slippage = Math.max(0, Number($("slippage").value) || 0);
-      const url = `https://biquote.io/api/${pair}/ohlc?interval=${interval}&limit=200`;
+      const url = `https://biquote.io/api/${pair}/ohlc?interval=${interval}&limit=1000`;
 
       const response = await fetch(url, { cache: "no-store" });
       if (!response.ok) throw new Error("Market data request failed.");
