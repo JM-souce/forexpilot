@@ -251,6 +251,129 @@ async function analyze(){
 }
 $("analyze").addEventListener("click",analyze);
 $("refresh").addEventListener("click",analyze);
+
+function runHistoricalBacktest() {
+  const btn = $("runBacktest");
+  btn.disabled = true;
+  $("btStatus").textContent = "Fetching historical candles and running simulation...";
+
+  (async () => {
+    try {
+      const pair = $("pair").value;
+      const interval = $("tf").value;
+      const spread = Math.max(0, Number($("spread").value) || 0);
+      const slippage = Math.max(0, Number($("slippage").value) || 0);
+      const url = `https://biquote.io/api/${pair}/ohlc?interval=${interval}&limit=200`;
+
+      const response = await fetch(url, { cache: "no-store" });
+      if (!response.ok) throw new Error("Market data request failed.");
+      const data = await response.json();
+      if (!Array.isArray(data.bars) || data.bars.length < 80) {
+        throw new Error("Not enough historical candles. Try again later.");
+      }
+
+      const bars = data.bars.map(b => ({
+        time: b.openTime,
+        open: Number(b.open),
+        high: Number(b.high),
+        low: Number(b.low),
+        close: Number(b.close)
+      }))
+      .filter(b => [b.open, b.high, b.low, b.close].every(Number.isFinite))
+      .sort((a, b) => new Date(a.time) - new Date(b.time));
+
+      if (bars.length < 80) throw new Error("Not enough valid candles.");
+
+      const pip = pair.endsWith("JPY") ? 0.01 : 0.0001;
+      const cost = spread + 2 * slippage;
+      const trades = [];
+      let position = null;
+
+      // Calculate indicators using only candles available at each signal.
+      for (let i = 60; i < bars.length - 1; i++) {
+        const history = bars.slice(0, i + 1);
+        const closes = history.map(b => b.close);
+        const fast = ema(closes, 20);
+        const slow = ema(closes, 50);
+        const momentum = rsi(closes, 14);
+        const volatility = atr(history, 14);
+        if (![fast, slow, momentum, volatility].every(Number.isFinite) ||
+            volatility <= 0) continue;
+
+        // Close any existing position if its SL or TP is hit.
+        const bar = bars[i];
+        if (position) {
+          const hitSL = position.dir === 1
+            ? bar.low <= position.sl : bar.high >= position.sl;
+          const hitTP = position.dir === 1
+            ? bar.high >= position.tp : bar.low <= position.tp;
+
+          if (hitSL || hitTP) {
+            // Conservative rule: if both are hit in one candle, assume SL first.
+            const exit = hitSL ? position.sl : position.tp;
+            const gross = position.dir * (exit - position.entry) / pip;
+            trades.push(gross - cost);
+            position = null;
+          }
+        }
+
+        if (position) continue;
+
+        let dir = 0;
+        if (fast > slow && momentum >= 50 && momentum <= 70) dir = 1;
+        else if (fast < slow && momentum >= 30 && momentum <= 50) dir = -1;
+        if (!dir) continue;
+
+        // Enter at the next candle's open to avoid same-candle look-ahead.
+        const next = bars[i + 1];
+        const entry = next.open;
+        position = {
+          dir,
+          entry,
+          sl: entry - dir * 1.5 * volatility,
+          tp: entry + dir * 3 * volatility
+        };
+      }
+
+      // Close any remaining position at the final candle close.
+      if (position) {
+        const last = bars[bars.length - 1];
+        const gross = position.dir * (last.close - position.entry) / pip;
+        trades.push(gross - cost);
+      }
+
+      if (!trades.length) throw new Error("No completed trades in this sample.");
+
+      const wins = trades.filter(x => x > 0).length;
+      const net = trades.reduce((a, b) => a + b, 0);
+      const grossProfit = trades.filter(x => x > 0).reduce((a, b) => a + b, 0);
+      const grossLoss = -trades.filter(x => x < 0).reduce((a, b) => a + b, 0);
+      let equity = 0, peak = 0, maxDD = 0;
+      for (const t of trades) {
+        equity += t;
+        peak = Math.max(peak, equity);
+        maxDD = Math.max(maxDD, peak - equity);
+      }
+
+      $("btTrades").textContent = String(trades.length);
+      $("btWin").textContent = (100 * wins / trades.length).toFixed(1) + "%";
+      $("btNet").textContent = net.toFixed(1);
+      $("btPF").textContent = grossLoss
+        ? (grossProfit / grossLoss).toFixed(2)
+        : (grossProfit > 0 ? "∞" : "—");
+      $("btDD").textContent = maxDD.toFixed(1);
+      $("btSample").textContent = bars.length + " candles";
+      $("btStatus").textContent =
+        `${pair} ${interval}: simulation completed. Costs deducted: ${cost.toFixed(1)} pips per trade (estimated). Only ${bars.length} candles were tested; results are preliminary and do not predict future performance. Commission and swaps are excluded.`;
+    } catch (err) {
+      $("btStatus").textContent = "Backtest error: " + err.message;
+    } finally {
+      btn.disabled = false;
+    }
+  })();
+}
+
+$("runBacktest").addEventListener("click", runHistoricalBacktest);
 </script>
 </body>
  </html>
